@@ -1,37 +1,74 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Rocket : MonoBehaviour
 {
+    [SerializeField] float rcsThrust = 50f;
+    [SerializeField] float mainThrust = 50f;
+
     Rigidbody rigidBody;
+    AudioSource audioSource;
 
     // Start is called before the first frame update
     void Start()
     {
         rigidBody = GetComponent<Rigidbody>();
+        audioSource = GetComponent<AudioSource>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        ProcessInput();
+        Thrust();
+        Rotate();
     }
 
-    private void ProcessInput()
+    private void OnCollisionEnter(Collision collision)
     {
-        if (Input.GetKey(KeyCode.Space))
+        switch (collision.gameObject.tag)
         {
-            rigidBody.AddRelativeForce(Vector3.up);
+            case "Friendly":
+                print("start");
+                break;
+            case "Finish":
+                print("finished");
+                break;
+            case "Fuel":
+                print("fuel");
+                break;
+            default:
+                print("dead");
+                break;
         }
+    }
+
+    private void Rotate()
+    {
+        rigidBody.freezeRotation = true;
+        float rotationThisFrame = rcsThrust * Time.deltaTime;
         if (Input.GetKey(KeyCode.A))
         {
-            rigidBody.AddRelativeForce(Vector3.left);
+            transform.Rotate(Vector3.forward * rotationThisFrame);
         }
         else if (Input.GetKey(KeyCode.D))
         {
-            rigidBody.AddRelativeForce(Vector3.right);
+            transform.Rotate(-Vector3.forward * rotationThisFrame);
+        }
+        rigidBody.freezeRotation = false;
+    }
+
+    private void Thrust()
+    {
+        if (Input.GetKey(KeyCode.Space))
+        {
+            rigidBody.AddRelativeForce(Vector3.up * mainThrust);
+            if (!audioSource.isPlaying)
+            {
+                audioSource.Play();
+            }
+        }
+        else
+        {
+            audioSource.Stop();
         }
     }
 }
