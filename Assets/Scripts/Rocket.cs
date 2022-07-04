@@ -7,6 +7,8 @@ public class Rocket : MonoBehaviour
     //todo fix lighting bug
     [SerializeField] float rcsThrust = 50f;
     [SerializeField] float mainThrust = 30f;
+    [SerializeField] float levelLoadDelay = 2f;
+
     [SerializeField] AudioClip mainEngine;
     [SerializeField] AudioClip deadGame;
     [SerializeField] AudioClip succesGame;
@@ -60,7 +62,7 @@ public class Rocket : MonoBehaviour
         audioSource.Stop();
         deadGameParticle.Play();
         audioSource.PlayOneShot(deadGame);
-        Invoke("LoadFirstLevel", 1f);
+        Invoke("LoadFirstLevel", levelLoadDelay);
     }
 
     private void SuccessGame()
@@ -69,7 +71,7 @@ public class Rocket : MonoBehaviour
         audioSource.Stop();
         audioSource.PlayOneShot(succesGame);
         succesGameParticle.Play();
-        Invoke("LoadNextLevel", 1f);
+        Invoke("LoadNextLevel", levelLoadDelay);
     }
 
     private void LoadNextLevel()
@@ -99,7 +101,7 @@ public class Rocket : MonoBehaviour
 
     private void ApplyThrust()
     {
-        rigidBody.AddRelativeForce(Vector3.up * mainThrust);
+        rigidBody.AddRelativeForce(Vector3.up * mainThrust * Time.deltaTime);
         if (!audioSource.isPlaying)
         {
             audioSource.PlayOneShot(mainEngine);
