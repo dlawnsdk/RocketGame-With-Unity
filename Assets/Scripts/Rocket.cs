@@ -4,6 +4,7 @@ using UnityEngine.SceneManagement;
 
 public class Rocket : MonoBehaviour
 {
+    static int nowLevel;
     //todo fix lighting bug
     [SerializeField] float rcsThrust = 50f;
     [SerializeField] float mainThrust = 30f;
@@ -19,13 +20,15 @@ public class Rocket : MonoBehaviour
 
     Rigidbody rigidBody;
     AudioSource audioSource;
+    
     enum State { Alive, Dying, Transcending }
     State state = State.Alive;
 
+    
     // Start is called before the first frame update
     void Start()
     {
-        rigidBody = GetComponent<Rigidbody>();
+        rigidBody   = GetComponent<Rigidbody>();
         audioSource = GetComponent<AudioSource>();
     }
 
@@ -50,7 +53,7 @@ public class Rocket : MonoBehaviour
             case "Finish":
                 SuccessGame();
                 break;
-            default:
+            default:                
                 FailedGame();
                 break;
         }
@@ -58,6 +61,7 @@ public class Rocket : MonoBehaviour
 
     private void FailedGame()
     {
+        nowLevel = 0;
         state = State.Dying;
         audioSource.Stop();
         deadGameParticle.Play();
@@ -67,6 +71,7 @@ public class Rocket : MonoBehaviour
 
     private void SuccessGame()
     {
+
         state = State.Transcending;
         audioSource.Stop();
         audioSource.PlayOneShot(succesGame);
@@ -76,10 +81,19 @@ public class Rocket : MonoBehaviour
 
     private void LoadNextLevel()
     {
-        SceneManager.LoadScene(1);
+        nowLevel++;
+
+        if(nowLevel == 3)
+        {
+            nowLevel = 0;            
+
+        }
+        SceneManager.LoadScene(nowLevel);
+
     }
     private void LoadFirstLevel()
     {
+        nowLevel = 0;
         SceneManager.LoadScene(0);
     }
 
@@ -87,12 +101,12 @@ public class Rocket : MonoBehaviour
     {
         rigidBody.freezeRotation = true;
         float rotationThisFrame = rcsThrust * Time.deltaTime;
-        if (Input.GetKey(KeyCode.A))
+        if (Input.GetKey(KeyCode.LeftArrow))
         {
             transform.Rotate(Vector3.forward * rotationThisFrame);
         }
-        else if (Input.GetKey(KeyCode.D))
-        {
+        else if (Input.GetKey(KeyCode.RightArrow))
+            {
             transform.Rotate(-Vector3.forward * rotationThisFrame);
         }
         rigidBody.freezeRotation = false;
