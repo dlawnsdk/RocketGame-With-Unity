@@ -4,7 +4,7 @@ using UnityEngine.SceneManagement;
 
 public class Rocket : MonoBehaviour
 {
-    static int nowLevel;
+
     //todo fix lighting bug
     [SerializeField] float rcsThrust = 50f;
     [SerializeField] float mainThrust = 30f;
@@ -73,7 +73,6 @@ public class Rocket : MonoBehaviour
 
     private void FailedGame()
     {
-        nowLevel = 0;
         state = State.Dying;
         audioSource.Stop();
         deadGameParticle.Play();
@@ -93,19 +92,21 @@ public class Rocket : MonoBehaviour
 
     private void LoadNextLevel()
     {
-        nowLevel++;
+        int curScenIndex = SceneManager.GetActiveScene().buildIndex;
+        int nextScenIndex = curScenIndex + 1;
 
-        if(nowLevel == 3)
+        if(nextScenIndex == SceneManager.sceneCountInBuildSettings)
         {
-            nowLevel = 0;            
-
+            print("Test");
+            LoadFirstLevel();
         }
-        SceneManager.LoadScene(nowLevel);
+        print(nextScenIndex);
+
+        SceneManager.LoadScene(nextScenIndex);
 
     }
     private void LoadFirstLevel()
     {
-        nowLevel = 0;
         SceneManager.LoadScene(0);
     }
 
